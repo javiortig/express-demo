@@ -1,3 +1,7 @@
+const debug = require('debug');
+const startupDebugger = debug('app:startup');
+const dbDebugger = debug('app:db');
+
 const config = require('config');
 const Joi = require('joi');
 const helmet = require('helmet');
@@ -6,6 +10,9 @@ const logger = require('./logger');
 const express = require('express');
 
 const app = express();
+
+app.set('view engine', 'pug');
+app.set('views', './views');
 
 //Creating builtin middlewares:
 app.use(express.json());
@@ -23,9 +30,9 @@ if (app.get('env') === 'development'){
 }
 
 // Configuration:
-console.log('Mail pass: ' + config.get('mail.password'));
+startupDebugger('Mail pass: ' + config.get('mail.password'));
 
-
+dbDebugger('Starting db');
 
 let port = process.env.PORT || 3000;
 
@@ -36,12 +43,12 @@ const courses = [
 ];
 
 app.listen(port, () => {
-    console.log(`Listening on port ${port}...`)
+    startupDebugger(`Listening on port ${port}...`)
 });
 
 
 app.get('/', (req, res) => {
-    res.send("Hello World");
+    res.render('index', {title: 'My express app', message: 'Hello'});
 });
 
 app.get('/api/courses', (req, res) => {
