@@ -1,9 +1,31 @@
+const config = require('config');
 const Joi = require('joi');
-
+const helmet = require('helmet');
+const morgan = require('morgan');
+const logger = require('./logger');
 const express = require('express');
+
 const app = express();
 
+//Creating builtin middlewares:
 app.use(express.json());
+app.use(express.urlencoded( { extended: true}));
+app.use(express.static('public'));
+app.use(helmet());
+
+//Creating custom Middlewares
+app.use(logger.log);
+app.use(logger.auth);
+
+//Execute only if on development mode:
+if (app.get('env') === 'development'){
+    app.use(morgan('tiny'));
+}
+
+// Configuration:
+console.log('Mail pass: ' + config.get('mail.password'));
+
+
 
 let port = process.env.PORT || 3000;
 
